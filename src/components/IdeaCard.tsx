@@ -41,7 +41,7 @@ export const IdeaCard = ({
             <div className="flex items-center gap-2">
               <CardTitle className="text-xl">{title}</CardTitle>
               <Badge variant={
-                status === "approved" ? "success" :
+                status === "approved" ? "default" :
                 status === "rejected" ? "destructive" :
                 "secondary"
               }>
