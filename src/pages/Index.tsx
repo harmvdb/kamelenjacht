@@ -101,7 +101,7 @@ const Index = () => {
         transition={{ duration: 0.3 }}
         className="text-center space-y-4"
       >
-        <h1 className="text-4xl font-bold tracking-tight">Ideeën Platform</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Kamelenjacht</h1>
         <p className="text-muted-foreground max-w-[600px] mx-auto">
           Deel je ideeën met de community en stem op de beste voorstellen.
         </p>
