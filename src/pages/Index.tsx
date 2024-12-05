@@ -3,55 +3,95 @@ import { motion } from "framer-motion";
 import { IdeaCard } from "@/components/IdeaCard";
 import { NewIdeaForm } from "@/components/NewIdeaForm";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Idea {
   id: number;
   title: string;
   description: string;
-  votes: number;
+  upVotes: number;
+  downVotes: number;
+  status: "pending" | "approved" | "rejected";
 }
 
 const Index = () => {
+  const { toast } = useToast();
   const [ideas, setIdeas] = useState<Idea[]>([
     {
       id: 1,
       title: "Duurzame stadstuinen",
       description: "Een netwerk van stadstuinen waar bewoners samen kunnen tuinieren en verse groenten kunnen kweken.",
-      votes: 5,
+      upVotes: 5,
+      downVotes: 0,
+      status: "approved"
     },
     {
       id: 2,
       title: "Digitale buurtbibliotheek",
       description: "Een platform waar buurtbewoners boeken kunnen delen en lenen van elkaar.",
-      votes: 3,
+      upVotes: 3,
+      downVotes: 1,
+      status: "pending"
     },
   ]);
 
   const [showForm, setShowForm] = useState(false);
   const [sortBy, setSortBy] = useState<"newest" | "popular">("popular");
+  const [isModerator, setIsModerator] = useState(false);
 
   const handleNewIdea = (title: string, description: string) => {
     const newIdea: Idea = {
       id: Date.now(),
       title,
       description,
-      votes: 0,
+      upVotes: 0,
+      downVotes: 0,
+      status: "pending"
     };
     setIdeas([newIdea, ...ideas]);
     setShowForm(false);
+    toast({
+      title: "Idee ingediend",
+      description: "Je idee is succesvol ingediend en wacht op goedkeuring.",
+    });
   };
 
-  const handleVote = (id: number) => {
+  const handleUpVote = (id: number) => {
     setIdeas(
       ideas.map((idea) =>
-        idea.id === id ? { ...idea, votes: idea.votes + 1 } : idea
+        idea.id === id ? { ...idea, upVotes: idea.upVotes + 1 } : idea
       )
     );
   };
 
-  const sortedIdeas = [...ideas].sort((a, b) =>
-    sortBy === "popular" ? b.votes - a.votes : b.id - a.id
-  );
+  const handleDownVote = (id: number) => {
+    setIdeas(
+      ideas.map((idea) =>
+        idea.id === id ? { ...idea, downVotes: idea.downVotes + 1 } : idea
+      )
+    );
+  };
+
+  const handleModerate = (id: number, approved: boolean) => {
+    setIdeas(
+      ideas.map((idea) =>
+        idea.id === id
+          ? { ...idea, status: approved ? "approved" : "rejected" }
+          : idea
+      )
+    );
+    toast({
+      title: approved ? "Idee goedgekeurd" : "Idee afgekeurd",
+      description: `Het idee is succesvol ${approved ? "goedgekeurd" : "afgekeurd"}.`,
+    });
+  };
+
+  const sortedIdeas = [...ideas].sort((a, b) => {
+    if (sortBy === "popular") {
+      return (b.upVotes - b.downVotes) - (a.upVotes - a.downVotes);
+    }
+    return b.id - a.id;
+  });
 
   return (
     <div className="container py-8 space-y-8">
@@ -82,9 +122,17 @@ const Index = () => {
             Nieuwste
           </Button>
         </div>
-        <Button onClick={() => setShowForm(!showForm)}>
-          {showForm ? "Annuleren" : "Nieuw idee"}
-        </Button>
+        <div className="space-x-2">
+          <Button onClick={() => setShowForm(!showForm)}>
+            {showForm ? "Annuleren" : "Nieuw idee"}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => setIsModerator(!isModerator)}
+          >
+            {isModerator ? "Gebruikersweergave" : "Moderatorweergave"}
+          </Button>
+        </div>
       </div>
 
       {showForm && (
@@ -104,8 +152,13 @@ const Index = () => {
             key={idea.id}
             title={idea.title}
             description={idea.description}
-            votes={idea.votes}
-            onVote={() => handleVote(idea.id)}
+            upVotes={idea.upVotes}
+            downVotes={idea.downVotes}
+            status={idea.status}
+            onUpVote={() => handleUpVote(idea.id)}
+            onDownVote={() => handleDownVote(idea.id)}
+            onModerate={isModerator ? (approved) => handleModerate(idea.id, approved) : undefined}
+            isModeratorView={isModerator}
           />
         ))}
       </div>
