@@ -5,6 +5,8 @@ import { NewIdeaForm } from "@/components/NewIdeaForm";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { InfoSection } from "@/components/InfoSection";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 interface Idea {
   id: number;
@@ -39,6 +41,8 @@ const Index = () => {
   const [showForm, setShowForm] = useState(false);
   const [sortBy, setSortBy] = useState<"newest" | "popular">("popular");
   const [isModerator, setIsModerator] = useState(false);
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [password, setPassword] = useState("");
 
   const handleNewIdea = (title: string, description: string) => {
     const newIdea: Idea = {
@@ -87,6 +91,33 @@ const Index = () => {
     });
   };
 
+  const handlePasswordSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === "Kameel") {
+      setIsModerator(true);
+      setShowPasswordDialog(false);
+      toast({
+        title: "Toegang verleend",
+        description: "Je hebt nu toegang tot de moderator functies.",
+      });
+    } else {
+      toast({
+        title: "Incorrect wachtwoord",
+        description: "Probeer het opnieuw.",
+        variant: "destructive",
+      });
+    }
+    setPassword("");
+  };
+
+  const handleModeratorClick = () => {
+    if (!isModerator) {
+      setShowPasswordDialog(true);
+    } else {
+      setIsModerator(false);
+    }
+  };
+
   const sortedIdeas = [...ideas].sort((a, b) => {
     if (sortBy === "popular") {
       return (b.upVotes - b.downVotes) - (a.upVotes - a.downVotes);
@@ -131,7 +162,7 @@ const Index = () => {
           </Button>
           <Button
             variant="outline"
-            onClick={() => setIsModerator(!isModerator)}
+            onClick={handleModeratorClick}
           >
             {isModerator ? "Gebruikersweergave" : "Moderatorweergave"}
           </Button>
@@ -148,6 +179,26 @@ const Index = () => {
           <NewIdeaForm onSubmit={handleNewIdea} />
         </motion.div>
       )}
+
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Wachtwoord vereist</DialogTitle>
+            <DialogDescription>
+              Voer het wachtwoord in om toegang te krijgen tot de moderator functies.
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+            <Input
+              type="password"
+              placeholder="Voer wachtwoord in"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button type="submit" className="w-full">Bevestig</Button>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {sortedIdeas.map((idea) => (
