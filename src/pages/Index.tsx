@@ -170,6 +170,7 @@ const Index = () => {
         setShowForm={setShowForm}
         isModerator={isModerator}
         onModeratorClick={handleModeratorClick}
+        ideas={ideas}
       />
 
       {showForm && (
