@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown, Check, X } from "lucide-react";
+import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ModeratorControls } from "./ModeratorControls";
 
 interface IdeaCardProps {
   title: string;
@@ -13,6 +14,8 @@ interface IdeaCardProps {
   onUpVote: () => void;
   onDownVote: () => void;
   onModerate?: (approved: boolean) => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
   isModeratorView?: boolean;
 }
 
@@ -25,6 +28,8 @@ export const IdeaCard = ({
   onUpVote, 
   onDownVote,
   onModerate,
+  onEdit,
+  onDelete,
   isModeratorView 
 }: IdeaCardProps) => {
   const totalVotes = upVotes - downVotes;
@@ -50,25 +55,13 @@ export const IdeaCard = ({
                  "In behandeling"}
               </Badge>
             </div>
-            {isModeratorView && status === "pending" ? (
-              <div className="flex gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onModerate?.(true)}
-                  className="text-green-500"
-                >
-                  <Check className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => onModerate?.(false)}
-                  className="text-red-500"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
+            {isModeratorView ? (
+              <ModeratorControls
+                status={status}
+                onModerate={(approved) => onModerate?.(approved)}
+                onEdit={() => onEdit?.()}
+                onDelete={() => onDelete?.()}
+              />
             ) : (
               <div className="flex items-center gap-2">
                 <Button

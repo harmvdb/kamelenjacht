@@ -7,6 +7,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { InfoSection } from "@/components/InfoSection";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { EditIdeaDialog } from "@/components/EditIdeaDialog";
 
 interface Idea {
   id: number;
@@ -43,6 +44,7 @@ const Index = () => {
   const [isModerator, setIsModerator] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [password, setPassword] = useState("");
+  const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
 
   const handleNewIdea = (title: string, description: string) => {
     const newIdea: Idea = {
@@ -89,6 +91,38 @@ const Index = () => {
       title: approved ? "Idee goedgekeurd" : "Idee afgekeurd",
       description: `Het idee is succesvol ${approved ? "goedgekeurd" : "afgekeurd"}.`,
     });
+  };
+
+  const handleEdit = (id: number) => {
+    const idea = ideas.find((i) => i.id === id);
+    if (idea) {
+      setEditingIdea(idea);
+    }
+  };
+
+  const handleDelete = (id: number) => {
+    setIdeas(ideas.filter((idea) => idea.id !== id));
+    toast({
+      title: "Idee verwijderd",
+      description: "Het idee is succesvol verwijderd.",
+    });
+  };
+
+  const handleSaveEdit = (title: string, description: string) => {
+    if (editingIdea) {
+      setIdeas(
+        ideas.map((idea) =>
+          idea.id === editingIdea.id
+            ? { ...idea, title, description }
+            : idea
+        )
+      );
+      toast({
+        title: "Idee bijgewerkt",
+        description: "Het idee is succesvol bijgewerkt.",
+      });
+    }
+    setEditingIdea(null);
   };
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
@@ -200,6 +234,15 @@ const Index = () => {
         </DialogContent>
       </Dialog>
 
+      {editingIdea && (
+        <EditIdeaDialog
+          open={!!editingIdea}
+          onOpenChange={(open) => !open && setEditingIdea(null)}
+          idea={editingIdea}
+          onSave={handleSaveEdit}
+        />
+      )}
+
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {sortedIdeas.map((idea) => (
           <IdeaCard
@@ -212,6 +255,8 @@ const Index = () => {
             onUpVote={() => handleUpVote(idea.id)}
             onDownVote={() => handleDownVote(idea.id)}
             onModerate={isModerator ? (approved) => handleModerate(idea.id, approved) : undefined}
+            onEdit={isModerator ? () => handleEdit(idea.id) : undefined}
+            onDelete={isModerator ? () => handleDelete(idea.id) : undefined}
             isModeratorView={isModerator}
           />
         ))}
