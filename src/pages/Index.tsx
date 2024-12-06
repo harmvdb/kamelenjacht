@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { IdeaCard } from "@/components/IdeaCard";
-import { NewIdeaForm } from "@/components/NewIdeaForm";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { Header } from "@/components/Header";
+import { ActionBar } from "@/components/ActionBar";
+import { PasswordDialog } from "@/components/PasswordDialog";
+import { IdeasList } from "@/components/IdeasList";
+import { NewIdeaForm } from "@/components/NewIdeaForm";
 import { InfoSection } from "@/components/InfoSection";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { EditIdeaDialog } from "@/components/EditIdeaDialog";
 
 interface Idea {
@@ -161,47 +161,16 @@ const Index = () => {
 
   return (
     <div className="container py-8 space-y-8">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="text-center space-y-4"
-      >
-        <h1 className="text-4xl font-bold tracking-tight">Kamelenjacht</h1>
-        <p className="text-xl text-muted-foreground">
-          maak van de dal-dag een top-dag
-        </p>
-      </motion.div>
-
+      <Header />
       <InfoSection />
-
-      <div className="flex justify-between items-center">
-        <div className="space-x-2">
-          <Button
-            variant={sortBy === "popular" ? "default" : "outline"}
-            onClick={() => setSortBy("popular")}
-          >
-            Populair
-          </Button>
-          <Button
-            variant={sortBy === "newest" ? "default" : "outline"}
-            onClick={() => setSortBy("newest")}
-          >
-            Nieuwste
-          </Button>
-        </div>
-        <div className="space-x-2">
-          <Button onClick={() => setShowForm(!showForm)}>
-            {showForm ? "Annuleren" : "Nieuw idee"}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={handleModeratorClick}
-          >
-            {isModerator ? "Gebruikersweergave" : "Moderatorweergave"}
-          </Button>
-        </div>
-      </div>
+      <ActionBar
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        showForm={showForm}
+        setShowForm={setShowForm}
+        isModerator={isModerator}
+        onModeratorClick={handleModeratorClick}
+      />
 
       {showForm && (
         <motion.div
@@ -214,25 +183,13 @@ const Index = () => {
         </motion.div>
       )}
 
-      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Wachtwoord vereist</DialogTitle>
-            <DialogDescription>
-              Voer het wachtwoord in om toegang te krijgen tot de moderator functies.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <Input
-              type="password"
-              placeholder="Voer wachtwoord in"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <Button type="submit" className="w-full">Bevestig</Button>
-          </form>
-        </DialogContent>
-      </Dialog>
+      <PasswordDialog
+        open={showPasswordDialog}
+        onOpenChange={setShowPasswordDialog}
+        password={password}
+        setPassword={setPassword}
+        onSubmit={handlePasswordSubmit}
+      />
 
       {editingIdea && (
         <EditIdeaDialog
@@ -243,24 +200,15 @@ const Index = () => {
         />
       )}
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {sortedIdeas.map((idea) => (
-          <IdeaCard
-            key={idea.id}
-            title={idea.title}
-            description={idea.description}
-            upVotes={idea.upVotes}
-            downVotes={idea.downVotes}
-            status={idea.status}
-            onUpVote={() => handleUpVote(idea.id)}
-            onDownVote={() => handleDownVote(idea.id)}
-            onModerate={isModerator ? (approved) => handleModerate(idea.id, approved) : undefined}
-            onEdit={isModerator ? () => handleEdit(idea.id) : undefined}
-            onDelete={isModerator ? () => handleDelete(idea.id) : undefined}
-            isModeratorView={isModerator}
-          />
-        ))}
-      </div>
+      <IdeasList
+        ideas={sortedIdeas}
+        isModerator={isModerator}
+        onUpVote={handleUpVote}
+        onDownVote={handleDownVote}
+        onModerate={handleModerate}
+        onEdit={handleEdit}
+        onDelete={handleDelete}
+      />
     </div>
   );
 };
