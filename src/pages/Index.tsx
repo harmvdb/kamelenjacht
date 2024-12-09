@@ -45,6 +45,7 @@ const Index = () => {
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [password, setPassword] = useState("");
   const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const handleNewIdea = (title: string, description: string) => {
     const newIdea: Idea = {
@@ -152,12 +153,24 @@ const Index = () => {
     }
   };
 
-  const sortedIdeas = [...ideas].sort((a, b) => {
-    if (sortBy === "popular") {
-      return (b.upVotes - b.downVotes) - (a.upVotes - a.downVotes);
-    }
-    return b.id - a.id;
-  });
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+  };
+
+  const filteredAndSortedIdeas = [...ideas]
+    .filter(idea => {
+      const query = searchQuery.toLowerCase();
+      return (
+        idea.title.toLowerCase().includes(query) ||
+        idea.description.toLowerCase().includes(query)
+      );
+    })
+    .sort((a, b) => {
+      if (sortBy === "popular") {
+        return (b.upVotes - b.downVotes) - (a.upVotes - a.downVotes);
+      }
+      return b.id - a.id;
+    });
 
   return (
     <div className="container py-8 space-y-8">
@@ -171,6 +184,7 @@ const Index = () => {
         isModerator={isModerator}
         onModeratorClick={handleModeratorClick}
         ideas={ideas}
+        onSearch={handleSearch}
       />
 
       {showForm && (
@@ -202,7 +216,7 @@ const Index = () => {
       )}
 
       <IdeasList
-        ideas={sortedIdeas}
+        ideas={filteredAndSortedIdeas}
         isModerator={isModerator}
         onUpVote={handleUpVote}
         onDownVote={handleDownVote}
