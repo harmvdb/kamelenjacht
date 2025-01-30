@@ -9,9 +9,9 @@ export const Header = () => (
   >
     <div className="flex justify-center mb-4">
       <img
-        src="/photo-1469041797191-50ace28483c3"
-        alt="Kamelen"
-        className="w-32 h-32 object-cover rounded-full shadow-lg"
+        src="/lovable-uploads/7b514a3e-c813-4f7a-81c5-3ead9d291f8b.png"
+        alt="Een kameel die door een kantoor rent"
+        className="w-64 h-48 object-contain shadow-lg rounded-lg"
       />
     </div>
     <h1 className="text-4xl font-bold tracking-tight">Kamelenjacht</h1>
