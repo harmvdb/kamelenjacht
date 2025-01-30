@@ -8,6 +8,7 @@ import { IdeasList } from "@/components/IdeasList";
 import { NewIdeaForm } from "@/components/NewIdeaForm";
 import { InfoSection } from "@/components/InfoSection";
 import { EditIdeaDialog } from "@/components/EditIdeaDialog";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Idea {
   id: number;
@@ -157,6 +158,19 @@ const Index = () => {
     setSearchQuery(query);
   };
 
+  const handleImportIdeas = async (importedIdeas: Array<{ title: string; description: string }>) => {
+    const newIdeas = importedIdeas.map((idea) => ({
+      id: Date.now() + Math.random(), // Generate unique IDs
+      title: idea.title,
+      description: idea.description,
+      upVotes: 0,
+      downVotes: 0,
+      status: "pending" as const
+    }));
+
+    setIdeas([...newIdeas, ...ideas]);
+  };
+
   const filteredAndSortedIdeas = [...ideas]
     .filter(idea => {
       const query = searchQuery.toLowerCase();
@@ -184,7 +198,8 @@ const Index = () => {
         isModerator={isModerator}
         onModeratorClick={handleModeratorClick}
         ideas={ideas}
-        onSearch={handleSearch}
+        onSearch={setSearchQuery}
+        onImportIdeas={handleImportIdeas}
       />
 
       {showForm && (
