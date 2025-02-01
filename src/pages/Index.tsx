@@ -11,7 +11,7 @@ import { EditIdeaDialog } from "@/components/EditIdeaDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Idea {
-  id: number;
+  id: string; // Changed from number to string
   title: string;
   description: string;
   upVotes: number;
@@ -23,7 +23,7 @@ const Index = () => {
   const { toast } = useToast();
   const [ideas, setIdeas] = useState<Idea[]>([
     {
-      id: 1,
+      id: "1", // Changed from number to string
       title: "Duurzame stadstuinen",
       description: "Een netwerk van stadstuinen waar bewoners samen kunnen tuinieren en verse groenten kunnen kweken.",
       upVotes: 5,
@@ -31,7 +31,7 @@ const Index = () => {
       status: "approved"
     },
     {
-      id: 2,
+      id: "2", // Changed from number to string
       title: "Digitale buurtbibliotheek",
       description: "Een platform waar buurtbewoners boeken kunnen delen en lenen van elkaar.",
       upVotes: 3,
@@ -50,7 +50,7 @@ const Index = () => {
 
   const handleNewIdea = (title: string, description: string) => {
     const newIdea: Idea = {
-      id: Date.now(),
+      id: crypto.randomUUID(), // Using UUID instead of Date.now()
       title,
       description,
       upVotes: 0,
@@ -65,7 +65,7 @@ const Index = () => {
     });
   };
 
-  const handleUpVote = (id: number) => {
+  const handleUpVote = (id: string) => { // Changed from number to string
     setIdeas(
       ideas.map((idea) =>
         idea.id === id ? { ...idea, upVotes: idea.upVotes + 1 } : idea
@@ -73,7 +73,7 @@ const Index = () => {
     );
   };
 
-  const handleDownVote = (id: number) => {
+  const handleDownVote = (id: string) => { // Changed from number to string
     setIdeas(
       ideas.map((idea) =>
         idea.id === id ? { ...idea, downVotes: idea.downVotes + 1 } : idea
@@ -81,7 +81,7 @@ const Index = () => {
     );
   };
 
-  const handleModerate = (id: number, approved: boolean) => {
+  const handleModerate = (id: string, approved: boolean) => { // Changed from number to string
     setIdeas(
       ideas.map((idea) =>
         idea.id === id
@@ -95,14 +95,14 @@ const Index = () => {
     });
   };
 
-  const handleEdit = (id: number) => {
+  const handleEdit = (id: string) => { // Changed from number to string
     const idea = ideas.find((i) => i.id === id);
     if (idea) {
       setEditingIdea(idea);
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (id: string) => { // Changed from number to string
     setIdeas(ideas.filter((idea) => idea.id !== id));
     toast({
       title: "Idee verwijderd",
@@ -160,7 +160,7 @@ const Index = () => {
 
   const handleImportIdeas = async (importedIdeas: Array<{ title: string; description: string }>) => {
     const newIdeas = importedIdeas.map((idea) => ({
-      id: Date.now() + Math.random(), // Generate unique IDs
+      id: crypto.randomUUID(), // Using UUID instead of Date.now()
       title: idea.title,
       description: idea.description,
       upVotes: 0,
