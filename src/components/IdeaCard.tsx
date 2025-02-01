@@ -44,72 +44,74 @@ export const IdeaCard = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
+      className="h-full"
     >
-      <Card className="card-hover">
-        <CardHeader className="space-y-1">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <CardTitle className="text-xl">{title}</CardTitle>
+      <Card className="card-hover flex flex-col h-full">
+        <CardHeader className="flex-none">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start gap-2 min-w-0">
+              <CardTitle className="text-xl truncate">{title}</CardTitle>
               <Badge variant={
                 status === "approved" ? "default" :
                 status === "rejected" ? "destructive" :
                 "secondary"
-              }>
+              } className="flex-none">
                 {status === "approved" ? "Goedgekeurd" :
                  status === "rejected" ? "Afgekeurd" :
                  "In behandeling"}
               </Badge>
             </div>
-            {isModeratorView ? (
+            {isModeratorView && (
               <ModeratorControls
                 status={status}
                 onModerate={(approved) => onModerate?.(approved)}
                 onEdit={() => onEdit?.()}
                 onDelete={() => onDelete?.()}
               />
-            ) : (
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onUpVote();
-                  }}
-                  className="text-green-500"
-                  disabled={status !== "approved"}
-                >
-                  <ThumbsUp className="h-4 w-4" />
-                </Button>
-                <span className="min-w-[2rem] text-center">{totalVotes}</span>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onDownVote();
-                  }}
-                  className="text-red-500"
-                  disabled={status !== "approved"}
-                >
-                  <ThumbsDown className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowComments(true);
-                  }}
-                >
-                  <MessageCircle className="h-4 w-4" />
-                </Button>
-              </div>
             )}
           </div>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground line-clamp-3">{description}</p>
+        <CardContent className="flex flex-col flex-grow">
+          <p className="text-muted-foreground line-clamp-3 flex-grow">{description}</p>
+          {!isModeratorView && (
+            <div className="flex items-center justify-end gap-2 mt-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUpVote();
+                }}
+                className="text-green-500"
+                disabled={status !== "approved"}
+              >
+                <ThumbsUp className="h-4 w-4" />
+              </Button>
+              <span className="min-w-[2rem] text-center">{totalVotes}</span>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDownVote();
+                }}
+                className="text-red-500"
+                disabled={status !== "approved"}
+              >
+                <ThumbsDown className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowComments(true);
+                }}
+              >
+                <MessageCircle className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
       <CommentsDialog
