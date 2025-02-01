@@ -47,20 +47,18 @@ export const IdeaCard = ({
       className="h-full"
     >
       <Card className="card-hover flex flex-col h-full">
-        <CardHeader className="flex-none">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex items-start gap-2 min-w-0">
-              <CardTitle className="text-xl truncate">{title}</CardTitle>
-              <Badge variant={
-                status === "approved" ? "default" :
-                status === "rejected" ? "destructive" :
-                "secondary"
-              } className="flex-none">
-                {status === "approved" ? "Goedgekeurd" :
-                 status === "rejected" ? "Afgekeurd" :
-                 "In behandeling"}
-              </Badge>
-            </div>
+        <CardHeader className="flex-none space-y-3">
+          <CardTitle className="text-xl">{title}</CardTitle>
+          <div className="flex items-center justify-between gap-2">
+            <Badge variant={
+              status === "approved" ? "default" :
+              status === "rejected" ? "destructive" :
+              "secondary"
+            }>
+              {status === "approved" ? "Goedgekeurd" :
+               status === "rejected" ? "Afgekeurd" :
+               "In behandeling"}
+            </Badge>
             {isModeratorView && (
               <ModeratorControls
                 status={status}
