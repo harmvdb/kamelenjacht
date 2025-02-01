@@ -23,7 +23,7 @@ const Index = () => {
   const { toast } = useToast();
   const [ideas, setIdeas] = useState<Idea[]>([
     {
-      id: "1", // Changed from number to string
+      id: "123e4567-e89b-12d3-a456-426614174000",
       title: "Duurzame stadstuinen",
       description: "Een netwerk van stadstuinen waar bewoners samen kunnen tuinieren en verse groenten kunnen kweken.",
       upVotes: 5,
@@ -31,7 +31,7 @@ const Index = () => {
       status: "approved"
     },
     {
-      id: "2", // Changed from number to string
+      id: "987fcdeb-51a2-43d7-9b56-254415174000",
       title: "Digitale buurtbibliotheek",
       description: "Een platform waar buurtbewoners boeken kunnen delen en lenen van elkaar.",
       upVotes: 3,
@@ -50,7 +50,7 @@ const Index = () => {
 
   const handleNewIdea = (title: string, description: string) => {
     const newIdea: Idea = {
-      id: crypto.randomUUID(), // Using UUID instead of Date.now()
+      id: crypto.randomUUID(),
       title,
       description,
       upVotes: 0,
@@ -183,7 +183,6 @@ const Index = () => {
       if (sortBy === "popular") {
         return (b.upVotes - b.downVotes) - (a.upVotes - a.downVotes);
       }
-      // For newest, compare the string IDs in reverse order
       return b.id.localeCompare(a.id);
     });
 
