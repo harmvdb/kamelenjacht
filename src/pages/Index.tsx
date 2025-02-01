@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useToast } from "@/components/ui/use-toast";
 import { Header } from "@/components/Header";
@@ -21,25 +21,7 @@ interface Idea {
 
 const Index = () => {
   const { toast } = useToast();
-  const [ideas, setIdeas] = useState<Idea[]>([
-    {
-      id: "123e4567-e89b-12d3-a456-426614174000",
-      title: "Duurzame stadstuinen",
-      description: "Een netwerk van stadstuinen waar bewoners samen kunnen tuinieren en verse groenten kunnen kweken.",
-      upVotes: 5,
-      downVotes: 0,
-      status: "approved"
-    },
-    {
-      id: "987fcdeb-51a2-43d7-9b56-254415174000",
-      title: "Digitale buurtbibliotheek",
-      description: "Een platform waar buurtbewoners boeken kunnen delen en lenen van elkaar.",
-      upVotes: 3,
-      downVotes: 1,
-      status: "pending"
-    },
-  ]);
-
+  const [ideas, setIdeas] = useState<Idea[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [sortBy, setSortBy] = useState<"newest" | "popular">("popular");
   const [isModerator, setIsModerator] = useState(false);
@@ -48,24 +30,87 @@ const Index = () => {
   const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleNewIdea = (title: string, description: string) => {
+  useEffect(() => {
+    fetchIdeas();
+  }, []);
+
+  const fetchIdeas = async () => {
+    const { data, error } = await supabase
+      .from('ideas')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching ideas:', error);
+      toast({
+        title: "Error fetching ideas",
+        description: "There was an error fetching the ideas. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formattedIdeas = data.map(idea => ({
+      id: idea.id,
+      title: idea.title,
+      description: idea.description,
+      upVotes: idea.votes_count || 0,
+      downVotes: 0,
+      status: idea.approved ? "approved" : "pending" as "pending" | "approved" | "rejected"
+    }));
+
+    setIdeas(formattedIdeas);
+  };
+
+  const handleNewIdea = async (title: string, description: string) => {
+    const { data, error } = await supabase
+      .from('ideas')
+      .insert([
+        { title, description }
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      toast({
+        title: "Error submitting idea",
+        description: "There was an error submitting your idea. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const newIdea: Idea = {
-      id: crypto.randomUUID(),
-      title,
-      description,
+      id: data.id,
+      title: data.title,
+      description: data.description,
       upVotes: 0,
       downVotes: 0,
       status: "pending"
     };
+
     setIdeas([newIdea, ...ideas]);
     setShowForm(false);
     toast({
-      title: "Idee ingediend",
-      description: "Je idee is succesvol ingediend en wacht op goedkeuring.",
+      title: "Idea submitted",
+      description: "Your idea has been successfully submitted and is awaiting approval.",
     });
   };
 
-  const handleUpVote = (id: string) => { // Changed from number to string
+  const handleUpVote = async (id: string) => {
+    const { error } = await supabase
+      .from('ideas')
+      .update({ votes_count: ideas.find(i => i.id === id)?.upVotes! + 1 })
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: "Error updating vote",
+        description: "There was an error updating your vote. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIdeas(
       ideas.map((idea) =>
         idea.id === id ? { ...idea, upVotes: idea.upVotes + 1 } : idea
@@ -73,7 +118,21 @@ const Index = () => {
     );
   };
 
-  const handleDownVote = (id: string) => { // Changed from number to string
+  const handleDownVote = async (id: string) => {
+    const { error } = await supabase
+      .from('ideas')
+      .update({ votes_count: ideas.find(i => i.id === id)?.upVotes! - 1 })
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: "Error updating vote",
+        description: "There was an error updating your vote. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIdeas(
       ideas.map((idea) =>
         idea.id === id ? { ...idea, downVotes: idea.downVotes + 1 } : idea
