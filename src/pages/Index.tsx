@@ -11,7 +11,7 @@ import { EditIdeaDialog } from "@/components/EditIdeaDialog";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Idea {
-  id: string; // Changed from number to string
+  id: string;
   title: string;
   description: string;
   upVotes: number;
@@ -183,7 +183,8 @@ const Index = () => {
       if (sortBy === "popular") {
         return (b.upVotes - b.downVotes) - (a.upVotes - a.downVotes);
       }
-      return b.id - a.id;
+      // For newest, compare the string IDs in reverse order
+      return b.id.localeCompare(a.id);
     });
 
   return (
