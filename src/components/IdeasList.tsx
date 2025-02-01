@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { IdeaCard } from "./IdeaCard";
 
 interface Idea {
-  id: number;
+  id: string;
   title: string;
   description: string;
   upVotes: number;
@@ -13,11 +13,11 @@ interface Idea {
 interface IdeasListProps {
   ideas: Idea[];
   isModerator: boolean;
-  onUpVote: (id: number) => void;
-  onDownVote: (id: number) => void;
-  onModerate: (id: number, approved: boolean) => void;
-  onEdit: (id: number) => void;
-  onDelete: (id: number) => void;
+  onUpVote: (id: string) => void;
+  onDownVote: (id: string) => void;
+  onModerate: (id: string, approved: boolean) => void;
+  onEdit: (id: string) => void;
+  onDelete: (id: string) => void;
 }
 
 export const IdeasList = ({
@@ -33,6 +33,7 @@ export const IdeasList = ({
     {ideas.map((idea) => (
       <IdeaCard
         key={idea.id}
+        id={idea.id}
         title={idea.title}
         description={idea.description}
         upVotes={idea.upVotes}

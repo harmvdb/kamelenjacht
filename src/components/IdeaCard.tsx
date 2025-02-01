@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
+import { ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
 import { ModeratorControls } from "./ModeratorControls";
+import { CommentsDialog } from "./CommentsDialog";
 
 interface IdeaCardProps {
+  id: string;
   title: string;
   description: string;
   upVotes: number;
@@ -20,6 +23,7 @@ interface IdeaCardProps {
 }
 
 export const IdeaCard = ({ 
+  id,
   title, 
   description, 
   upVotes, 
@@ -32,6 +36,7 @@ export const IdeaCard = ({
   onDelete,
   isModeratorView 
 }: IdeaCardProps) => {
+  const [showComments, setShowComments] = useState(false);
   const totalVotes = upVotes - downVotes;
 
   return (
@@ -89,6 +94,16 @@ export const IdeaCard = ({
                 >
                   <ThumbsDown className="h-4 w-4" />
                 </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowComments(true);
+                  }}
+                >
+                  <MessageCircle className="h-4 w-4" />
+                </Button>
               </div>
             )}
           </div>
@@ -97,6 +112,11 @@ export const IdeaCard = ({
           <p className="text-muted-foreground line-clamp-3">{description}</p>
         </CardContent>
       </Card>
+      <CommentsDialog
+        ideaId={id}
+        open={showComments}
+        onOpenChange={setShowComments}
+      />
     </motion.div>
   );
 };
